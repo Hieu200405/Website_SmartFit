@@ -1,18 +1,18 @@
-const jwt = require('jsonwebtoken'); // Giả sử dùng JWT
-
-// Mock secret key cho đơn giản
-const SECRET_KEY = 'your_secret_key';
+const jwt = require('jsonwebtoken');
 
 const authMiddleware = (req, res, next) => {
+  const SECRET_KEY = process.env.JWT_SECRET;
+  
+  if (!SECRET_KEY) {
+    console.error('FATAL: JWT_SECRET environment variable is not defined.');
+    return res.status(500).json({ message: 'Internal Server Error (Misconfiguration)' });
+  }
+
   // Lấy token từ header Authorization: "Bearer <token>"
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
   if (!token) {
-    // Nếu không có token, trả về 401 Unauthorized
-    // Trong môi trường dev đơn giản, có thể mock user ở đây nếu cần:
-    // req.user = { id: 1, role: 'user' }; 
-    // return next();
     return res.status(401).json({ message: 'Access denied. No token provided.' });
   }
 
